@@ -3,6 +3,6 @@ services:
     name: parkour-worlds
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && node build.js
     startCommand: npm start
     healthCheckPath: /health
