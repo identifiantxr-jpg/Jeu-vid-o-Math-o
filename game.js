@@ -69,9 +69,14 @@ function upd(p,t){const s=p.sp||1,a=p.amp||0,q=t*s+p.ph;let ox=0,oy=0,oz=0;
  const nx=p.bx+ox,ny=p.by+oy,nz=p.bz+oz;
  p.dx=p.cx===undefined?0:nx-p.cx;p.dy=p.cy===undefined?0:ny-p.cy;p.dz=p.cz===undefined?0:nz-p.cz;p.cx=nx;p.cy=ny;p.cz=nz;
  p.m.position.set(nx,ny-.5,nz);p.x0=nx-p.w/2;p.x1=nx+p.w/2;p.z0=nz-p.d/2;p.z1=nz+p.d/2;p.top=ny;p.bot=ny-1}
+const SKT_={};function skyTex(k){if(SKT_[k])return SKT_[k];const c=cvs();c.width=c.height=256;const x=c.getContext('2d');
+ if(k){x.fillStyle='#74d052';x.fillRect(0,0,256,256);for(let i=0;i<2200;i++){x.fillStyle='hsla('+(88+Math.random()*28)+',55%,'+(38+Math.random()*24)+'%,.4)';x.fillRect(Math.random()*256,Math.random()*256,2+Math.random()*3,3+Math.random()*5)}}
+ else{x.fillStyle='#8a6a48';x.fillRect(0,0,256,256);for(let b=0;b<8;b++){x.fillStyle='hsla(28,'+(25+Math.random()*15)+'%,'+(28+Math.random()*18)+'%,.55)';x.fillRect(0,b*32+Math.random()*8,256,10+Math.random()*18)}for(let i=0;i<900;i++){x.fillStyle='rgba(0,0,0,'+Math.random()*.12+')';x.fillRect(Math.random()*256,Math.random()*256,3,2)}}
+ const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=4;return SKT_[k]=t}
+const skyM=(s,k)=>{const t=skyTex(k).clone();t.needsUpdate=true;t.repeat.set(k?Math.max(1,s/4):Math.max(2,s*.8),k?Math.max(1,s/4):1);return new T.MeshStandardMaterial({map:t,roughness:.85,metalness:0,flatShading:true,envMap:GFX.tex,envMapIntensity:.5})};
 function plat(x,y,z,s,hue,o){const w=W[wi],sh=w.shape,hh=hue%1;
  const g=sh=='box'?new T.BoxGeometry(s,1,s):new T.CylinderGeometry(s/2,s/2*.92,1,sh=='hex'?6:sh=='oct'?8:28);
- const SKY=w.lay=='sky'&&!o.fall&&!o.bounce,L_=c=>new T.MeshLambertMaterial({color:c,flatShading:true}),m=new T.Mesh(g,SKY?[L_(0x8a6a48),L_(0x74d052),L_(0x6a4a30)]:mkp(o.fall?0x8a4a3a:o.bounce?0xffcc22:new T.Color().setHSL(hh,w.sat,w.lit)));
+ const SKY=w.lay=='sky'&&!o.fall&&!o.bounce,L_=c=>new T.MeshLambertMaterial({color:c,flatShading:true}),m=new T.Mesh(g,SKY?[skyM(s,0),skyM(s,1),L_(0x6a4a30)]:mkp(o.fall?0x8a4a3a:o.bounce?0xffcc22:new T.Color().setHSL(hh,w.sat,w.lit)));
  if(!SKY)m.add(new T.LineSegments(new T.EdgesGeometry(g,30),new T.LineBasicMaterial({color:o.fall?0xff5533:o.bounce?0xffffff:new T.Color().setHSL(hh,1,.75)})));
  const rm=new T.MeshBasicMaterial({color:hdr(o.fall?0xff5533:o.bounce?0xffffff:new T.Color().setHSL(hh,1,.6),2.4),side:T.DoubleSide});
  if(sh=='box'){const e=.08;[[s,e,e,0,s/2],[s,e,e,0,-s/2],[e,e,s,s/2,0],[e,e,s,-s/2,0]].forEach(a=>{const b=new T.Mesh(new T.BoxGeometry(a[0],a[1],a[2]),rm);b.position.set(a[3],.5,a[4]);m.add(b)})}
@@ -108,7 +113,7 @@ function worldScenery(k,pts,w){
  const rn=(s=>()=>(s=s*16807%2147483647)/2147483647)(k*97+13),n=pts.length;let cx=0,cz=0;pts.forEach(q=>{cx+=q[0];cz+=q[2]});cx/=n;cz/=n;
   const wd=WD[k];if(wd.scenery)wd.scenery({k,pts,w,rn,n,cx,cz,G,SPN,FLT})}
 // ---------- pont vers les fichiers world-*.js ----------
-const CTX={T,mk,hdr,inst,GT};
+const CTX={T,mk,hdr,inst,GT,GFX};
 const WD=WORLD_ORDER.map(id=>{const d=WORLDS[id];return Object.assign({},d,d.init?d.init(CTX):{})});
 function build(k){wi=k;const w=W[k],wd=WD[k];if(w.lobby)Object.assign(w,TH[SAVE.eq.lobby]||TH.def);if(G){sc.remove(G);sc.remove(SK)}G=new T.Group();SK=new T.Group();sc.add(G,SK);
  PL=[];coins=[];gems=[];parts=[];SPN=[];FLT=[];BRD=[];SKT=null;pads.length=0;pulses=[];portals=[];step=0;wt=0;
@@ -118,12 +123,12 @@ function build(k){wi=k;const w=W[k],wd=WD[k];if(w.lobby)Object.assign(w,TH[SAVE.
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(a,3));SK.add(new T.Points(g,new T.PointsMaterial({size:1.3,color:0xffffff,fog:false})));
   const s=new T.Mesh(new T.SphereGeometry(26,24,16),new T.MeshBasicMaterial({color:w.sunc,fog:false}));s.position.set(-110,w.lobby?20:70,-200);SK.add(s);skyExtras(w)}
  let h=0,x=0,z=0,y=0,px=0,py=0,pz=0;const pts=[],te0=Math.floor(lvl/2),L=w.lay;
- for(let i=0;i<=(w.lobby?0:N);i++){const tr=Math.floor(i/9),te=Math.min(4,tr+te0),kk=i%3,fin=i==N;
+ const NN_=wd.N||N;for(let i=0;i<=(w.lobby?0:NN_);i++){const tr=Math.floor(i/9),te=Math.min(4,tr+te0),kk=i%3,fin=i==NN_;
   let dd=4.8+te*.45+w.gap,rs=.55+te*.04+w.rise,sz=Math.max(2.1,3.5-te*.35),tn=w.turn(i),o={};
   if(wd.track){const t=wd.track(i,te,{dd,rs,sz,tn});dd=t.dd;rs=t.rs;sz=t.sz;tn=t.tn}
   if(fin)dd+=wd.finDd||1.5;
   if(i>0){h+=tn;x+=Math.sin(h)*dd;z-=Math.cos(h)*dd;y+=rs}
-  const hue=w.h[tr]+(i%9)*.006;let p;
+  const hue=w.h[tr%w.h.length]+(i%9)*.006;let p;
   if(i==0){p=plat(0,0,0,wd.s0||8,hue,w.lobby?{tier:0}:{cp:1,ok:1,tier:0});if(w.lobby){portal(0,0,0,[0,1,2,3,4].sort((a,b)=>(owned(b)?1:0)-(owned(a)?1:0)),0,[[-13.3,-4.3],[-8.2,-11.3],[0,-14],[8.2,-11.3],[13.3,-4.3]]);lobbyExtras()}}
   else if(fin){p=plat(x,y,z,wd.sf||10,hue,{});portal(x,y,z,SAVE.mode?[5]:[5].concat(W.map((_,j)=>j).filter(j=>j!=wi&&j<5&&owned(j)).sort(()=>Math.random()-.5).slice(0,2)),wd.pr||3.4)}
   else if(i%9==0)p=plat(x,y,z,wd.cp||5,hue,{cp:1,tier:tr});
@@ -131,10 +136,10 @@ function build(k){wi=k;const w=W[k],wd=WD[k];if(w.lobby)Object.assign(w,TH[SAVE.
    if(wd.opts)o=wd.opts(i,kk,te);
    p=plat(x,y,z,sz,hue,o);
    if(kk==1&&!o.mv&&!o.fall&&!o.bounce)coin(x,y+1.4,z);else if(kk==2)coin((x+px)/2,(y+py)/2+2.3,(z+pz)/2)}
-  pts.push([x,y,z,h]);px=x;py=y;pz=z}
+  pts.push([x,y,z,h,p.rr||0]);px=x;py=y;pz=z}
  if(!w.lobby)[14,31].forEach(ix=>{const q=pts[ix],id=wi+'-'+ix;if(!q||SAVE.gems[id])return;const a=ix==14?1:-1,hx=Math.cos(q[3])*6.5*a,hz=Math.sin(q[3])*6.5*a;plat(q[0]+hx,q[1]+1.6,q[2]+hz,2.6,w.h[2],{});gem(q[0]+hx,q[1]+3,q[2]+hz,id)});
- for(let i=0;i<(w.lobby?0:w.lay=='sky'?70:45);i++){const b=pts[Math.floor(Math.random()*pts.length)],a=Math.random()*6.28,d=14+Math.random()*40,m=deco(w.deco);
-  const cx_=b[0]+Math.cos(a)*d,cy_=b[1]+Math.random()*40-25,cz_=b[2]+Math.sin(a)*d;if(w.lay=='sky'&&pts.some(q=>Math.hypot(q[0]-cx_,q[1]-cy_,q[2]-cz_)<30))continue;m.position.set(cx_,cy_,cz_);if(w.deco=='cloud'){m.rotation.set(0,Math.random()*3,0);FLT.push({m,x0:cx_,y0:cy_,z0:cz_,ph:Math.random()*6,ax:8,ay:.8})}else m.rotation.set(Math.random()*3,Math.random()*3,0);G.add(m)}
+ for(let i=0;i<(w.lobby?0:w.lay=='sky'?Math.max(70,Math.round(NN_*1.1)):45);i++){const b=pts[Math.floor(Math.random()*pts.length)],a=Math.random()*6.28,d=14+Math.random()*40,m=deco(w.deco);
+  const cx_=b[0]+Math.cos(a)*d,cy_=b[1]+Math.random()*40-25,cz_=b[2]+Math.sin(a)*d;if(w.lay=='sky'&&pts.some(q=>Math.hypot(q[0]-cx_,q[1]-cy_,q[2]-cz_)<30+(q[4]||0)))continue;m.position.set(cx_,cy_,cz_);if(w.deco=='cloud'){m.rotation.set(0,Math.random()*3,0);FLT.push({m,x0:cx_,y0:cy_,z0:cz_,ph:Math.random()*6,ax:8,ay:.8})}else m.rotation.set(Math.random()*3,Math.random()*3,0);G.add(m)}
  if(w.lay=='sky'||w.lay=='tower')worldScenery(k,pts,w);
  FL=null;if(w.fl=='grid')FL=new T.GridHelper(500,75,0xff3ec8,0x6a2a9a);
  else if(w.fl&&w.lay!='sky'){FL=new T.Mesh(new T.PlaneGeometry(900,900),new T.MeshBasicMaterial({color:w.fl=='lava'?0xff4a10:w.fc,transparent:w.fl=='sea',opacity:.85}));FL.rotation.x=-Math.PI/2;if(w.fl=='lava'){const lt=lavaTex();lt.repeat.set(60,60);FL.material.map=lt;FL.material.color.set(0xffffff)}}
