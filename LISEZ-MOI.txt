@@ -1,0 +1,63 @@
+﻿GREG & LES DINOSAURES — mode d'emploi
+=====================================
+
+CONTENU DU DOSSIER
+  index.html            la page du jeu
+  style.css             le style
+  script.js             tout le code (le jeu + patchs 1 à 11 + les modèles 3D)
+  models/               les modèles 3D (Quaternius, licence CC0 = libres d'usage)
+  Lancer le jeu.bat     pour jouer sur l'ordinateur
+  serveur.ps1           petit serveur utilisé par "Lancer le jeu.bat"
+
+
+1) JOUER SUR L'ORDINATEUR
+-------------------------
+Double-cliquez sur "Lancer le jeu.bat".
+Une fenêtre noire s'ouvre (le serveur) et le jeu s'ouvre dans le navigateur.
+Laissez la fenêtre noire ouverte pendant que vous jouez ; fermez-la à la fin.
+
+Pourquoi pas un simple double-clic sur index.html ? Parce que le navigateur
+refuse de charger les modèles 3D depuis un fichier : il faut un petit serveur.
+
+Astuce : http://localhost:8766/?sans3d lance le jeu avec l'ancien décor
+(utile pour comparer, ou si un ordinateur est trop lent).
+
+
+2) METTRE LE JEU SUR CODEPEN
+----------------------------
+Le HTML, le CSS et le JS se collent dans CodePen comme d'habitude :
+  index.html -> case HTML,  style.css -> case CSS,  script.js -> case JS.
+
+MAIS les modèles 3D (dossier models/) ne peuvent pas aller sur CodePen gratuit.
+Il faut les mettre sur GitHub (gratuit), puis dire au jeu où les trouver :
+
+  a. Créez un compte sur https://github.com
+  b. Créez un dépôt PUBLIC, par exemple "greg-modeles"
+  c. Dans le dépôt : "Add file" -> "Upload files", glissez le dossier "models"
+     entier, puis "Commit changes".
+     GitHub accepte 100 fichiers par envoi : si c'est refusé, envoyez d'abord
+     models/nature, puis models/village (en gardant les noms des dossiers).
+  d. Dans CodePen, tout en HAUT de la case JS, ajoutez cette ligne
+     (remplacez VOTRE-PSEUDO par votre pseudo GitHub) :
+
+     window.MODELS_URL = 'https://cdn.jsdelivr.net/gh/VOTRE-PSEUDO/greg-modeles@main/models/';
+
+  e. Rechargez le pen : au menu, "Chargement des modèles 3D… %" s'affiche.
+
+Si les modèles ne se chargent pas, le jeu marche quand même avec l'ancien décor.
+
+
+3) CE QUI A CHANGÉ (modèles 3D)
+-------------------------------
+- Village : maisons médiévales à 1 ou 2 étages (murs en pierre et en
+  colombages, portes, fenêtres, volets, toits en tuiles, cheminées, lierre),
+  grande maison du chef, charrette, caisses, clôtures en bois.
+  Les 8 maisons de la mission apparaissent toujours quand on rapporte les rochers.
+- Arbres : chênes, sapins, pommiers (avec pommes) remplacés par les modèles ;
+  on peut toujours les couper et les prendre avec le pouvoir.
+- Rochers, buissons, herbe qui bouge au vent, fleurs, trèfles, fougères,
+  champignons, cailloux, pierres plates sur les chemins, pavés sur la place.
+- Quelques grands arbres tordus (érables rouges) et arbres morts sur la montagne.
+- Grotte : champignons, cailloux et rochers en plus.
+
+Modèles : Quaternius (https://quaternius.com), licence CC0.
